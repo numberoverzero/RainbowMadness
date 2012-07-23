@@ -7,6 +7,12 @@ namespace RainbowMadness.Data
 {
     public class Player
     {
+        List<Card> hand;
+
+        public Player()
+        {
+            hand = new List<Card>();
+        }
 
         public Color GetWildColor()
         {
@@ -15,7 +21,9 @@ namespace RainbowMadness.Data
 
         public void DrawCard(Game game, int nCards)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < nCards; i++)
+                hand.Add(game.DrawCard());
+
         }
     }
 }

@@ -23,6 +23,11 @@ namespace RainbowMadness.Data
             return true;
         }
 
+        public Card DrawCard()
+        {
+            throw new NotImplementedException();
+        }
+
         protected Player[] players;
         protected int nPlayers;
         protected int playerIndex;
