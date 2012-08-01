@@ -2,12 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Engine.DataStructures;
+using Engine.Utility;
 
 namespace RainbowMadness.Data
 {
     public class Game
     {
+        string deckFileName;
+        protected ICollection<Card> deck;
         protected List<Card> stack;
+
+        protected Player[] players;
+        protected int nPlayers;
+        protected int playerIndex;
+        protected bool reverse = false;
+
         public Card Top
         {
             get
@@ -16,23 +26,11 @@ namespace RainbowMadness.Data
                     return Card.NullCard;
                 return stack[stack.Count - 1];
             }
+            set
+            {
+                stack.Add(value);
+            }
         }
-        public bool SetTop(Card card)
-        {
-            stack.Add(card);
-            return true;
-        }
-
-        public Card DrawCard()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected Player[] players;
-        protected int nPlayers;
-        protected int playerIndex;
-        protected bool reverse = false;
-
         public Player CurrentPlayer
         {
             get
@@ -46,6 +44,22 @@ namespace RainbowMadness.Data
             {
                 return players[NextPlayerIndex()];
             }
+        }
+
+        public Game(string deckFileName)
+        {
+            this.deckFileName = deckFileName;
+        }
+
+        public Card DrawCard()
+        {
+            var card = deck.PopRandomElement();
+            if (card == null)
+            {
+                ResetDeck();
+                card = deck.PopRandomElement();
+            }
+            return card;
         }
 
         public void AdvancePlayer()
@@ -62,6 +76,11 @@ namespace RainbowMadness.Data
         public void ReversePlayDirection()
         {
             reverse = !reverse;
+        }
+
+        private void ResetDeck()
+        {
+            deck = Parsers.ParseDeck(deckFileName);
         }
     }
 }

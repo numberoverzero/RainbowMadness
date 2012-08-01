@@ -1,0 +1,28 @@
+[Red]
+WildDraw4 1
+0 4
+1 4
+2 4
+3 4
+4 4
+5 4
+6 4
+7 4
+
+[Blue]
+8 j
+9 4
+0 4
+1 4
+2 4
+
+[Yellow]
+Draw2 4
+WildDraw4 1
+
+[Green]
+Reverse 1
+
+[None]
+Wild 8
+WildDraw4 8

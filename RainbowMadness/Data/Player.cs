@@ -14,7 +14,7 @@ namespace RainbowMadness.Data
             hand = new List<Card>();
         }
 
-        public Color GetWildColor()
+        public Globals.CardColor GetWildColor()
         {
             throw new NotImplementedException();
         }

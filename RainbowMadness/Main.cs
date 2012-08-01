@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Engine.Input;
+using RainbowMadness.Data;
+using Engine.DataStructures;
 
 namespace RainbowMadness
 {
@@ -23,14 +25,19 @@ namespace RainbowMadness
     public class RainbowMadnessGame : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
-        BasicInjectableInputManager inputManager;
+        BasicInputManager inputManager;
         SpriteBatch spriteBatch;
+        ICollection<Card> deck;
 
         public RainbowMadnessGame()
         {
+            
             graphics = new GraphicsDeviceManager(this);
-            inputManager = new BasicInjectableInputManager();
+            inputManager = new BasicInputManager();
             Content.RootDirectory = "Content";
+
+            deck = Parsers.ParseDeck(@"Content\Decks\cards.txt");
+            
         }
 
         protected override void Initialize()
@@ -56,9 +63,9 @@ namespace RainbowMadness
 
         protected override void Update(GameTime gameTime)
         {
-            inputManager.Update();
             if (inputManager.IsPressed("exit", PlayerIndex.One))
-                Exit();
+                    Exit();
+            inputManager.Update();
             base.Update(gameTime);
         }
 
