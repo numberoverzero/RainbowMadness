@@ -49,6 +49,8 @@ namespace RainbowMadness.Data
         public Game(string deckFileName)
         {
             this.deckFileName = deckFileName;
+            ResetDeck();
+            Console.WriteLine("\n".Join(deck));
         }
 
         public Card DrawCard()

@@ -1,13 +1,16 @@
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using Engine.Input;
-using RainbowMadness.Data;
 using Engine.DataStructures;
+
+using RainbowMadness.Data;
 
 namespace RainbowMadness
 {
@@ -27,7 +30,7 @@ namespace RainbowMadness
         GraphicsDeviceManager graphics;
         BasicInputManager inputManager;
         SpriteBatch spriteBatch;
-        ICollection<Card> deck;
+        RainbowMadness.Data.Game game;
 
         public RainbowMadnessGame()
         {
@@ -35,9 +38,9 @@ namespace RainbowMadness
             graphics = new GraphicsDeviceManager(this);
             inputManager = new BasicInputManager();
             Content.RootDirectory = "Content";
+            Console.WriteLine();
+            game = new RainbowMadness.Data.Game(@"Content\Decks\cards.txt");
 
-            deck = Parsers.ParseDeck(@"Content\Decks\cards.txt");
-            
         }
 
         protected override void Initialize()

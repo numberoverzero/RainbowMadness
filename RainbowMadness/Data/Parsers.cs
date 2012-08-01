@@ -23,7 +23,7 @@ namespace RainbowMadness.Data
         
         public static ICollection<Card> ParseDeck(string filename)
         {
-            ICollection<Card> deck = new CountedSet<Card>();
+            ICollection<Card> deck = new CountedCollection<Card>();
             
             
             string colorRaw = null;
