@@ -9,6 +9,8 @@ namespace RainbowMadness.Data
 {
     public class Game
     {
+        #region Fields
+
         string deckFileName;
         protected ICollection<Card> deck;
         protected List<Card> stack;
@@ -45,6 +47,8 @@ namespace RainbowMadness.Data
                 return players[NextPlayerIndex()];
             }
         }
+
+        #endregion
 
         public Game(string deckFileName)
         {
