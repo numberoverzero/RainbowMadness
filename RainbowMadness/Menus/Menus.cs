@@ -12,11 +12,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace RainbowMadness
 {
-    public static class Bob
-    {
-        public static List<IScreen> Screens = new List<IScreen>();
-    }
-
     public static class ScreenManager
     {
         public static List<IScreen> Screens = new List<IScreen>();
@@ -83,16 +78,16 @@ namespace RainbowMadness
         void Update(float dt);
     }
 
-    public abstract class MenuScreen : IScreen
+    public abstract class MenuScreen<TTextBox> : IScreen where TTextBox: TextBox, new()
     {
-        private readonly List<string> _options;
-        private List<TextBox> _optionBoxes;
+        protected readonly List<string> Options;
+        protected List<TTextBox> OptionBoxes;
         private int _selectedIndex;
 
         protected MenuScreen()
         {
-            _options = new List<string>();
-            _optionBoxes = new List<TextBox>();
+            Options = new List<string>();
+            OptionBoxes = new List<TTextBox>();
         }
 
         public int SelectedIndex
@@ -100,10 +95,10 @@ namespace RainbowMadness
             get { return _selectedIndex; }
             set
             {
-                if (_options.Count == 0) return;
-                if (_selectedIndex < _optionBoxes.Count) _optionBoxes[_selectedIndex].Highlighted = false;
-                _selectedIndex = value.Mod(_options.Count);
-                _optionBoxes[_selectedIndex].Highlighted = true;
+                if (Options.Count == 0) return;
+                if (_selectedIndex < OptionBoxes.Count) OptionBoxes[_selectedIndex].Highlighted = false;
+                _selectedIndex = value.Mod(Options.Count);
+                OptionBoxes[_selectedIndex].Highlighted = true;
             }
         }
 
@@ -111,13 +106,14 @@ namespace RainbowMadness
 
         public void Draw(SpriteBatch batch)
         {
-            foreach (var optionBox in _optionBoxes)
+            if (OptionBoxes == null) return;
+            foreach (var optionBox in OptionBoxes)
                 optionBox.Draw(batch);
         }
 
         public void Update(float dt)
         {
-            foreach (var optionBox in _optionBoxes) optionBox.Update(dt);
+            foreach (var optionBox in OptionBoxes) optionBox.Update(dt);
             if (ScreenManager.Input.IsPressed("menu_up"))
                 SelectedIndex--;
             if (ScreenManager.Input.IsPressed("menu_down"))
@@ -137,43 +133,80 @@ namespace RainbowMadness
 
         #endregion
 
-        public void AddOption(string option)
+        public virtual void AddOption(string option)
         {
-            _options.Add(option);
+            Options.Add(option);
             RecalculateBoxes();
         }
 
-        public void RemoveOption(string option)
+        public virtual void RemoveOption(string option)
         {
-            var index = _options.IndexOf(option);
-            _options.Remove(option);
-            _optionBoxes.RemoveAt(index);
+            var index = Options.IndexOf(option);
+            Options.Remove(option);
+            OptionBoxes.RemoveAt(index);
             RecalculateBoxes();
         }
 
-        private void RecalculateBoxes()
+        protected virtual void RecalculateBoxes()
         {
             var oldSelectedIndex = _selectedIndex;
-            _optionBoxes = new List<TextBox>();
+            OptionBoxes = new List<TTextBox>();
             var width = (int) (0.75f*ScreenManager.Dimensions.X);
             var x = (int) (0.1f*ScreenManager.Dimensions.X);
             var y0 = (0.1f*ScreenManager.Dimensions.Y);
             var y = y0;
-            foreach (var option in _options)
+            foreach (var option in Options)
             {
-                var optionBox = new TextBox {X = x, Y = (int) y, Width = width, Text = option};
+                var optionBox = new TTextBox {X = x, Y = (int) y, Width = width, Text = option};
                 y += optionBox.Height*1.15f;
-                _optionBoxes.Add(optionBox);
+                OptionBoxes.Add(optionBox);
             }
-            if (_optionBoxes.Count == 0) return;
-            SelectedIndex = oldSelectedIndex > _optionBoxes.Count ? _optionBoxes.Count : oldSelectedIndex;
+            if (OptionBoxes.Count == 0) return;
+            SelectedIndex = oldSelectedIndex > OptionBoxes.Count ? OptionBoxes.Count : oldSelectedIndex;
         }
 
         protected abstract void OnSelect(int index);
         protected abstract void OnToggle(int index);
     }
 
-    public class MainScreen : MenuScreen
+    public abstract class OptionMenuScreen : MenuScreen<OptionTextBox>
+    {
+        private List<string> Descriptions;
+        private List<List<string>> OptionLists;
+ 
+        public void AddOption(string option, params string[] options)
+        {
+            Descriptions.Add(option);
+            OptionLists.Add(options.ToList());
+            base.AddOption(option);
+            
+        }
+
+        public OptionMenuScreen()
+        {
+            Descriptions = new List<string>();
+            OptionLists = new List<List<string>>();
+        }
+
+        protected override void OnToggle(int index)
+        {
+            var optionTextBox = OptionBoxes[index] as OptionTextBox;
+            if (optionTextBox != null) optionTextBox.OptionIndex++;
+        }
+
+        protected override void RecalculateBoxes()
+        {
+            base.RecalculateBoxes();
+            for(int i=0;i<Options.Count;i++)
+            {
+                var box = OptionBoxes[i];
+                box.Description = Descriptions[i];
+                box.Options = OptionLists[i];
+            }
+        }
+    }
+
+    public class MainScreen : MenuScreen<TextBox>
     {
         public MainScreen()
         {
@@ -199,26 +232,21 @@ namespace RainbowMadness
         }
     }
 
-    public class HostScreen : IScreen
+    public class HostScreen : OptionMenuScreen
     {
-        #region IScreen Members
-
-        public void Draw(SpriteBatch batch)
+        public HostScreen() : base()
         {
+            AddOption("[{0}] players", "2", "3", "4", "5", "6", "7");
+            AddOption("When I can't play a card, I must [{0}]", "draw one", "draw until I get a playable card");
+            AddOption("When I finish drawing I [{0}] play a card", "may", "may not");
+            AddOption("Password is [{0}]", "jellybean", "bob", "cucumber1743", "9rQhEfD3k$#i");
+        }
+
+        protected override void OnSelect(int index)
+        {
+            // Start hosting the game
             throw new NotImplementedException();
         }
-
-        public void Update(float dt)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsPopup
-        {
-            get { return false; }
-        }
-
-        #endregion
     }
 
     public class JoinScreen : IScreen
@@ -285,7 +313,24 @@ namespace RainbowMadness
         }
     }
 
-    public delegate void InputTextBoxEvent(InputTextBox sender);
+    public class OptionTextBox : TextBox
+    {
+        private int _optionIndex;
+        public int OptionIndex
+        {
+            get { return _optionIndex; }
+            set
+            {
+                if (Options.Count == 0) return;
+                _optionIndex = value.Mod(Options.Count);
+                
+            }
+        }
+        public List<string> Options { get; set; }
+        public string Description { get; set; }
+        public override string Text { get { return Options == null || Options.Count == 0 ?  "" :  Description.format(Options[OptionIndex]); } }
+
+    }
 
     public class InputTextBox : TextBox, IKeyboardSubscriber
     {
