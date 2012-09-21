@@ -1,81 +1,67 @@
 using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
+using Engine.Input.Managers.AddBindings;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-using Engine.Input;
-using Engine.DataStructures;
-
-using RainbowMadness.Data;
-
 namespace RainbowMadness
 {
-
 #if WINDOWS || XBOX
-    static class Program{
-        static void Main(string[] args){
-            using (RainbowMadnessGame game = new RainbowMadnessGame()){
+    internal static class Program
+    {
+        private static void Main(string[] args)
+        {
+            using (var game = new RainbowMadnessGame())
+            {
                 game.Run();
             }
         }
     }
 #endif
 
-    public class RainbowMadnessGame : Microsoft.Xna.Framework.Game
+    public class RainbowMadnessGame : Game
     {
-        GraphicsDeviceManager graphics;
-        BasicInputManager inputManager;
-        SpriteBatch spriteBatch;
-        RainbowMadness.Data.Game game;
+        private Data.Game _game;
+        private GraphicsDeviceManager _graphics;
+        private SpriteBatch _spriteBatch;
 
         public RainbowMadnessGame()
         {
-            
-            graphics = new GraphicsDeviceManager(this);
-            inputManager = new BasicInputManager();
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             Console.WriteLine();
-            game = new RainbowMadness.Data.Game(@"Content\Decks\cards.txt");
-
-        }
-
-        protected override void Initialize()
-        {
-            BasicInputManager.Initialize(Window);
-            InitializeInput();
-            base.Initialize();
+            _game = new Data.Game(@"Content\Decks\cards.txt");
         }
 
         protected void InitializeInput()
         {
-            inputManager.AddBinding("exit", PlayerIndex.One, Keys.Escape);
+            ScreenManager.Input.AddBinding("exit", PlayerIndex.One, Keys.Escape);
+            
+            ScreenManager.Input.AddBinding("menu_up", PlayerIndex.One, Keys.Up);
+            ScreenManager.Input.AddBinding("menu_down", PlayerIndex.One, Keys.Down);
+            ScreenManager.Input.AddBinding("menu_select", PlayerIndex.One, Keys.Enter);
+            ScreenManager.Input.AddBinding("menu_toggle", PlayerIndex.One, Keys.Space);
+            ScreenManager.Input.AddBinding("menu_back", PlayerIndex.One, Keys.Escape);
         }
 
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-        }
-
-        protected override void UnloadContent()
-        {
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            ScreenManager.Initialize(this, Window, GraphicsDevice, Content);
+            InitializeInput();
+            ScreenManager.OpenScreen(new MainScreen());
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (inputManager.IsPressed("exit", PlayerIndex.One))
-                    Exit();
-            inputManager.Update();
+            ScreenManager.Update((float) gameTime.ElapsedGameTime.TotalMilliseconds/1000);
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            ScreenManager.Draw(_spriteBatch);
             base.Draw(gameTime);
         }
     }

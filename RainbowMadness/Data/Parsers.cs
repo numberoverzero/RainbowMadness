@@ -63,7 +63,7 @@ namespace RainbowMadness.Data
                     {
                         count = int.Parse(countRaw);
                     }
-                    catch (FormatException e)
+                    catch
                     {
                         continue;
                     }
