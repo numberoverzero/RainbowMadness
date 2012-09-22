@@ -30,7 +30,6 @@ namespace RainbowMadness
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             Console.WriteLine();
-            _game = new Data.Game(@"Content\Decks\cards.txt");
         }
 
         protected void InitializeInput()
@@ -48,6 +47,7 @@ namespace RainbowMadness
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             ScreenManager.Initialize(this, Window, GraphicsDevice, Content);
+            _game = new Data.Game(@"Content\Decks\cards.txt", ScreenManager.Settings);
             InitializeInput();
             ScreenManager.OpenScreen(new MainScreen());
         }

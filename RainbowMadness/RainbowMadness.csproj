@@ -81,6 +81,7 @@
     <Compile Include="Data\Card.cs" />
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Data\Game.cs" />
+    <Compile Include="Data\GameSettings.cs" />
     <Compile Include="Data\Parsers.cs" />
     <Compile Include="Data\Player.cs" />
     <Compile Include="Menus\Menus.cs" />

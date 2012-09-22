@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Engine.Utility;
 using Engine.Input.EventInput;
 using Engine.Input.Managers;
 using Engine.Input.Managers.SinglePlayer;
-using Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RainbowMadness.Data;
+using Game = Microsoft.Xna.Framework.Game;
 
 namespace RainbowMadness
 {
@@ -22,7 +24,7 @@ namespace RainbowMadness
         public static GraphicsDevice Device;
         public static ContentManager Content;
         public static Game Game;
-
+        public static GameSettings Settings = new GameSettings();
         private static readonly Color BackgroundColor = Color.Black;
 
         public static void OpenScreen(IScreen screen)
@@ -78,7 +80,7 @@ namespace RainbowMadness
         void Update(float dt);
     }
 
-    public abstract class MenuScreen<TTextBox> : IScreen where TTextBox: TextBox, new()
+    public abstract class MenuScreen<TTextBox> : IScreen where TTextBox : TextBox, new()
     {
         protected readonly List<string> Options;
         protected List<TTextBox> OptionBoxes;
@@ -123,7 +125,7 @@ namespace RainbowMadness
             if (ScreenManager.Input.IsPressed("menu_toggle"))
                 OnToggle(SelectedIndex);
             if (ScreenManager.Input.IsPressed("menu_back"))
-                ScreenManager.CloseScreen(this);
+                OnClose();
         }
 
         public bool IsPopup
@@ -136,7 +138,7 @@ namespace RainbowMadness
         public virtual void AddOption(string option)
         {
             Options.Add(option);
-            RecalculateBoxes();
+            RecalculateBoxes(Options.Count-1, Options.Count);
         }
 
         public virtual void RemoveOption(string option)
@@ -144,19 +146,29 @@ namespace RainbowMadness
             var index = Options.IndexOf(option);
             Options.Remove(option);
             OptionBoxes.RemoveAt(index);
-            RecalculateBoxes();
+            RecalculateBoxes(Options.Count+1, Options.Count);
         }
 
-        protected virtual void RecalculateBoxes()
+        protected virtual void RecalculateBoxes(int oldCount, int newCount)
         {
+            if (oldCount >= newCount) return;
+            //newCount > oldCount
+
             var oldSelectedIndex = _selectedIndex;
-            OptionBoxes = new List<TTextBox>();
+            //OptionBoxes = new List<TTextBox>();
             var width = (int) (0.75f*ScreenManager.Dimensions.X);
             var x = (int) (0.1f*ScreenManager.Dimensions.X);
+            
             var y0 = (0.1f*ScreenManager.Dimensions.Y);
-            var y = y0;
-            foreach (var option in Options)
+            if (oldCount > 0)
             {
+                var last_option_box = OptionBoxes[OptionBoxes.Count - 1];
+                y0 = last_option_box.Y + last_option_box.Height*1.15f;
+            }
+            var y = y0;
+            for (int i = oldCount; i < newCount; i++)
+            {
+                var option = Options[i];
                 var optionBox = new TTextBox {X = x, Y = (int) y, Width = width, Text = option};
                 y += optionBox.Height*1.15f;
                 OptionBoxes.Add(optionBox);
@@ -167,37 +179,43 @@ namespace RainbowMadness
 
         protected abstract void OnSelect(int index);
         protected abstract void OnToggle(int index);
+        protected virtual void OnClose()
+        {
+            ScreenManager.CloseScreen(this);
+        }
     }
 
     public abstract class OptionMenuScreen : MenuScreen<OptionTextBox>
     {
-        private List<string> Descriptions;
-        private List<List<string>> OptionLists;
- 
+        private readonly List<string> Descriptions;
+        private readonly List<List<string>> OptionLists;
+        private readonly List<int> OptionIndexes; 
+
+        protected OptionMenuScreen()
+        {
+            Descriptions = new List<string>();
+            OptionLists = new List<List<string>>();
+            OptionIndexes = new List<int>();
+        }
+
         public void AddOption(string option, params string[] options)
         {
             Descriptions.Add(option);
             OptionLists.Add(options.ToList());
+            OptionIndexes.Add(0);
             base.AddOption(option);
-            
-        }
-
-        public OptionMenuScreen()
-        {
-            Descriptions = new List<string>();
-            OptionLists = new List<List<string>>();
         }
 
         protected override void OnToggle(int index)
         {
-            var optionTextBox = OptionBoxes[index] as OptionTextBox;
+            var optionTextBox = OptionBoxes[index];
             if (optionTextBox != null) optionTextBox.OptionIndex++;
         }
 
-        protected override void RecalculateBoxes()
+        protected override void RecalculateBoxes(int oldCount, int newCount)
         {
-            base.RecalculateBoxes();
-            for(int i=0;i<Options.Count;i++)
+            base.RecalculateBoxes(oldCount, newCount);
+            for (int i = 0; i < Options.Count; i++)
             {
                 var box = OptionBoxes[i];
                 box.Description = Descriptions[i];
@@ -212,6 +230,7 @@ namespace RainbowMadness
         {
             AddOption("Host Game");
             AddOption("Join Game");
+            AddOption("Settings");
         }
 
         protected override void OnSelect(int index)
@@ -224,6 +243,9 @@ namespace RainbowMadness
                 case 1:
                     ScreenManager.OpenScreen(new JoinScreen());
                     break;
+                case 2:
+                    ScreenManager.OpenScreen(new SettingsScreen());
+                    break;
             }
         }
 
@@ -232,20 +254,54 @@ namespace RainbowMadness
         }
     }
 
+    public class SettingsScreen : OptionMenuScreen
+    {
+        public SettingsScreen()
+        {
+            AddOption("Colorblind Mode [{0}]", "on", "off");
+            OptionBoxes[0].OptionIndex = ScreenManager.Settings.ColorblindMode ? 0 : 1;
+        }
+
+        protected override void OnSelect(int index)
+        {
+            OnClose();
+        }
+
+        protected override void OnClose()
+        {
+            base.OnClose();
+            ScreenManager.Settings.ColorblindMode = OptionBoxes[0].OptionIndex == 0;
+        }
+    }
+
     public class HostScreen : OptionMenuScreen
     {
-        public HostScreen() : base()
+        public HostScreen()
         {
             AddOption("[{0}] players", "2", "3", "4", "5", "6", "7");
+            var npStr = ScreenManager.Settings.NPlayers.ToString();
+            OptionBoxes[0].OptionIndex = OptionBoxes[0].Options.Contains(npStr) ? OptionBoxes[0].Options.IndexOf(npStr) : 0;
+
             AddOption("When I can't play a card, I must [{0}]", "draw one", "draw until I get a playable card");
+            OptionBoxes[1].OptionIndex = ScreenManager.Settings.DrawUntilPlayable ? 1 : 0;
+
             AddOption("When I finish drawing I [{0}] play a card", "may", "may not");
-            AddOption("Password is [{0}]", "jellybean", "bob", "cucumber1743", "9rQhEfD3k$#i");
+            OptionBoxes[2].OptionIndex = ScreenManager.Settings.CanPlayAfterDraw ? 0 : 1;
+
         }
 
         protected override void OnSelect(int index)
         {
             // Start hosting the game
             throw new NotImplementedException();
+        }
+
+        protected override void OnClose()
+        {
+            ScreenManager.Settings.NPlayers = Int32.Parse(OptionBoxes[0].Options[OptionBoxes[0].OptionIndex]);
+            ScreenManager.Settings.DrawUntilPlayable = OptionBoxes[1].OptionIndex == 1;
+            ScreenManager.Settings.CanPlayAfterDraw = OptionBoxes[2].OptionIndex == 0;
+            base.OnClose();
         }
     }
 
@@ -271,6 +327,7 @@ namespace RainbowMadness
                                 Y = (int) (y + _server.Height*1.15f),
                                 Width = width
                             };
+            _server.Input = ScreenManager.Settings.JoinServer;
         }
 
         #region IScreen Members
@@ -298,7 +355,7 @@ namespace RainbowMadness
             if (ScreenManager.Input.IsPressed("menu_select"))
                 OnSelect();
             if (ScreenManager.Input.IsPressed("menu_back"))
-                ScreenManager.CloseScreen(this);
+                OnClose();
         }
 
         #endregion
@@ -306,6 +363,12 @@ namespace RainbowMadness
         protected void OnSelect(string server, string password)
         {
             Console.WriteLine("Server: {0}, Password: {1}".format(_server.Text, _password.Text));
+        }
+
+        private void OnClose()
+        {
+            ScreenManager.CloseScreen(this);
+            ScreenManager.Settings.JoinServer = _server.Input;
         }
 
         private void OnSelect()
@@ -316,6 +379,7 @@ namespace RainbowMadness
     public class OptionTextBox : TextBox
     {
         private int _optionIndex;
+
         public int OptionIndex
         {
             get { return _optionIndex; }
@@ -323,13 +387,16 @@ namespace RainbowMadness
             {
                 if (Options.Count == 0) return;
                 _optionIndex = value.Mod(Options.Count);
-                
             }
         }
+
         public List<string> Options { get; set; }
         public string Description { get; set; }
-        public override string Text { get { return Options == null || Options.Count == 0 ?  "" :  Description.format(Options[OptionIndex]); } }
 
+        public override string Text
+        {
+            get { return Options == null || Options.Count == 0 ? "" : Description.format(Options[OptionIndex]); }
+        }
     }
 
     public class InputTextBox : TextBox, IKeyboardSubscriber
@@ -343,7 +410,7 @@ namespace RainbowMadness
 
         public string Label { get; set; }
         public string Delimeter { get; set; }
-        public string Input { get; private set; }
+        public string Input { get; set; }
         public bool PasswordBox { get; set; }
 
         public new bool Highlighted

@@ -50,11 +50,10 @@ namespace RainbowMadness.Data
 
         #endregion
 
-        public Game(string deckFileName)
+        public Game(string deckFileName, GameSettings settings)
         {
             this.deckFileName = deckFileName;
             ResetDeck();
-            //Console.WriteLine("\n".Join(deck));
         }
 
         public Card DrawCard()
