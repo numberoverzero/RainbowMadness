@@ -38,6 +38,8 @@ namespace RainbowMadness
             
             ScreenManager.Input.AddBinding("menu_up", PlayerIndex.One, Keys.Up);
             ScreenManager.Input.AddBinding("menu_down", PlayerIndex.One, Keys.Down);
+            ScreenManager.Input.AddBinding("menu_left", PlayerIndex.One, Keys.Left);
+            ScreenManager.Input.AddBinding("menu_right", PlayerIndex.One, Keys.Right);
             ScreenManager.Input.AddBinding("menu_select", PlayerIndex.One, Keys.Enter);
             ScreenManager.Input.AddBinding("menu_toggle", PlayerIndex.One, Keys.Space);
             ScreenManager.Input.AddBinding("menu_back", PlayerIndex.One, Keys.Escape);

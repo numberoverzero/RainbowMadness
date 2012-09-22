@@ -84,7 +84,12 @@
     <Compile Include="Data\GameSettings.cs" />
     <Compile Include="Data\Parsers.cs" />
     <Compile Include="Data\Player.cs" />
-    <Compile Include="Menus\Menus.cs" />
+    <Compile Include="Menus\Components.cs" />
+    <Compile Include="Menus\CustomMenus.cs" />
+    <Compile Include="Menus\ScreenManager.cs" />
+    <Compile Include="Menus\PopupScreen.cs" />
+    <Compile Include="Menus\MenuScreens.cs" />
+    <Compile Include="Menus\IScreen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Util.cs" />

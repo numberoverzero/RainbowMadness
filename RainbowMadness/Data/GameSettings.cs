@@ -12,5 +12,6 @@ namespace RainbowMadness.Data
         public bool DrawUntilPlayable { get; set; }
         public bool CanPlayAfterDraw { get; set; }
         public string JoinServer { get; set; }
+        public string Username { get; set; }
     }
 }
