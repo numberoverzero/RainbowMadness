@@ -12,7 +12,7 @@ namespace RainbowMadness.Packets
         {
             var b = new ByteArrayBuilder();
             b.Add(Type.AsByteArray());
-            b.Add(Username.WithTermChar().GetBytesUTF8());
+            b.Add(Username.WithTermChar().AsByteArray());
             return b.GetByteArray();
         }
 
@@ -46,7 +46,7 @@ namespace RainbowMadness.Packets
             var b = new ByteArrayBuilder();
             b.Add(Type.AsByteArray());
             b.Add(Success.AsByteArray());
-            b.Add(Username.WithTermChar().GetBytesUTF8());
+            b.Add(Username.WithTermChar().AsByteArray());
             return b.GetByteArray();
         }
 

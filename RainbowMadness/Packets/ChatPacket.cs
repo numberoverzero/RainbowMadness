@@ -13,7 +13,7 @@ namespace RainbowMadness.Packets
         {
             var b = new ByteArrayBuilder();
             b.Add(Type.AsByteArray());
-            b.Add(Message.WithTermChar().GetBytesUTF8());
+            b.Add(Message.WithTermChar().AsByteArray());
             return b.GetByteArray().WithSizePrefix();
         }
 

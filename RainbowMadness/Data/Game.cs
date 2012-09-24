@@ -9,83 +9,81 @@ namespace RainbowMadness.Data
 {
     public class Game
     {
-        #region Fields
+        readonly string _deckFileName;
+        protected ICollection<Card> Deck;
+        protected List<Card> Stack;
 
-        string deckFileName;
-        protected ICollection<Card> deck;
-        protected List<Card> stack;
-
-        protected Player[] players;
-        protected int nPlayers;
-        protected int playerIndex;
-        protected bool reverse = false;
+        protected Player[] Players;
+        protected int PlayerIndex;
+        protected bool Reverse = false;
 
         public Card Top
         {
             get
             {
-                if (stack == null || stack.Count == 0)
+                if (Stack == null || Stack.Count == 0)
                     return Card.NullCard;
-                return stack[stack.Count - 1];
+                return Stack[Stack.Count - 1];
             }
             set
             {
-                stack.Add(value);
+                Stack.Add(value);
             }
         }
         public Player CurrentPlayer
         {
             get
             {
-                return players[playerIndex];
+                return Players[PlayerIndex];
             }
         }
         public Player NextPlayer
         {
             get
             {
-                return players[NextPlayerIndex()];
+                return Players[NextPlayerIndex()];
             }
         }
 
-        #endregion
+        public GameSettings Settings;
 
         public Game(string deckFileName, GameSettings settings)
         {
-            this.deckFileName = deckFileName;
+            this._deckFileName = deckFileName;
+            Settings = settings;
             ResetDeck();
         }
 
         public Card DrawCard()
         {
-            var card = deck.PopRandomElement();
+            var card = Deck.PopRandomElement();
             if (card == null)
             {
                 ResetDeck();
-                card = deck.PopRandomElement();
+                card = Deck.PopRandomElement();
             }
             return card;
         }
 
         public void AdvancePlayer()
         {
-            playerIndex = NextPlayerIndex();
+            PlayerIndex = NextPlayerIndex();
         }
 
         private int NextPlayerIndex()
         {
-            int offset = reverse ? -1 : 1;
-            return Util.WrappedIndex(nPlayers, playerIndex + offset);
+            int offset = Reverse ? -1 : 1;
+            return MathExtensions.WrappedIndex(PlayerIndex + offset, Settings.NPlayers);
         }
 
         public void ReversePlayDirection()
         {
-            reverse = !reverse;
+            Reverse = !Reverse;
         }
 
         private void ResetDeck()
         {
-            deck = Parsers.ParseDeck(deckFileName);
+            Deck = Parsers.ParseDeck(_deckFileName);
         }
     }
 }

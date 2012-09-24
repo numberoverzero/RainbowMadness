@@ -3,6 +3,7 @@ using Engine.Input.Managers.AddBindings;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RainbowMadness.Packets;
 
 namespace RainbowMadness
 {
@@ -27,6 +28,7 @@ namespace RainbowMadness
 
         public RainbowMadnessGame()
         {
+            PacketGlobals.Initialize();
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             Console.WriteLine();
@@ -35,7 +37,7 @@ namespace RainbowMadness
         protected void InitializeInput()
         {
             ScreenManager.Input.AddBinding("exit", PlayerIndex.One, Keys.Escape);
-            
+
             ScreenManager.Input.AddBinding("menu_up", PlayerIndex.One, Keys.Up);
             ScreenManager.Input.AddBinding("menu_down", PlayerIndex.One, Keys.Down);
             ScreenManager.Input.AddBinding("menu_left", PlayerIndex.One, Keys.Left);

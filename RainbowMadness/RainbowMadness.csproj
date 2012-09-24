@@ -78,6 +78,7 @@
     <Reference Include="System.Net" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientServer\GameServer.cs" />
     <Compile Include="Data\Card.cs" />
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Data\Game.cs" />
@@ -90,9 +91,12 @@
     <Compile Include="Menus\PopupScreen.cs" />
     <Compile Include="Menus\MenuScreens.cs" />
     <Compile Include="Menus\IScreen.cs" />
+    <Compile Include="Packets\AuthenticateUserPacket.cs" />
+    <Compile Include="Packets\CardPackets.cs" />
+    <Compile Include="Packets\ChatPacket.cs" />
+    <Compile Include="Packets\PacketGlobals.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RainbowMadnessContent\RainbowMadnessContent.contentproj">
