@@ -28,9 +28,9 @@ namespace RainbowMadness.Packets
         /// <returns/>
         public override int FromByteArray(byte[] bytes, int startIndex)
         {
-            // type(4) | message(n)
+            // Type | Message
             var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32(); // Type
+            reader.ReadInt32();
             Username = reader.ReadString();
             return reader.Index;
         }
@@ -52,10 +52,10 @@ namespace RainbowMadness.Packets
 
         public override int FromByteArray(byte[] bytes, int startIndex)
         {
-            // type(4) | Success (1) | message(n)
+            // Type | Success | Message
 
             var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32(); // Type
+            reader.ReadInt32();
             Success = reader.ReadBool();
             Username = reader.ReadString();
             return reader.Index;
