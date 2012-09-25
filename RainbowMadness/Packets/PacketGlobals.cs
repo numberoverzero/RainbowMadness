@@ -1,31 +1,40 @@
-﻿using Engine.DataStructures;
+﻿using System;
+using Engine.DataStructures;
 using Engine.Networking.Packets;
 
 namespace RainbowMadness.Packets
 {
     public static class PacketGlobals
     {
-        private static readonly BidirectionalDict<string, int> _mapping = new BidirectionalDict<string, int>();
+        private static readonly BidirectionalDict<string, int> Mapping = new BidirectionalDict<string, int>();
 
         public static void Initialize()
         {
-            Packet.GetTypeFunction = PacketGlobals.Type;
-            Packet.GetNameFunction = PacketGlobals.Name;
-            _mapping.Add(0000, "NullPacket");
-            _mapping.Add(0000, "ChatPacket");
-            _mapping.Add(0000, "AuthenticateUserPacket");
-            _mapping.Add(0000, "AuthenticateUserResponsePacket");
-            
+            Packet.GetTypeFunction = TypeFunc;
+            Packet.GetNameFunction = NameFunc;
+            Packet.BuildPacketFunction = ToPacket;
+            Mapping.Add(0000, "NullPacket");
+            Mapping.Add(0001, "ChatPacket");
+            Mapping.Add(0002, "AuthenticateUserPacket");
+            Mapping.Add(0003, "AuthenticateUserResponsePacket");
         }
 
-        public static int Type(string packetName)
+        public static int TypeFunc(string packetName)
         {
-            return _mapping[packetName];
+            return Mapping[packetName];
         }
 
-        public static string Name(int type)
+        public static string NameFunc(int type)
         {
-            return _mapping[type];
+            return Mapping[type];
+        }
+
+        public static Packet ToPacket(byte[] bytes)
+        {
+            var reader = new ByteArrayReader(bytes, 0);
+            var type = reader.ReadInt32();
+            var name = Packet.GetNameFunction(type);
+            return (Packet) Activator.CreateInstance(Type.GetType(name));
         }
     }
 }
