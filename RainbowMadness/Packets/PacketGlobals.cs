@@ -32,9 +32,13 @@ namespace RainbowMadness.Packets
         public static Packet ToPacket(byte[] bytes)
         {
             var reader = new ByteArrayReader(bytes, 0);
-            var type = reader.ReadInt32();
-            var name = Packet.GetNameFunction(type);
-            return (Packet) Activator.CreateInstance(Type.GetType(name));
+            var typeInt = reader.ReadInt32();
+            var name = Packet.GetNameFunction(typeInt);
+            var type = Type.GetType(name);
+            if (type == null) return Packet.EmptyPacket;
+            var packet = (Packet) Activator.CreateInstance(type);
+            packet.FromByteArray(bytes, 0);
+            return packet;
         }
     }
 }
