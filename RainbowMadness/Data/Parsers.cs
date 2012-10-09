@@ -23,7 +23,7 @@ namespace RainbowMadness.Data
                 {
                     // Header line, defining card color
                     var colorRaw = HeaderRegex.GetNamedCapture(line, "header");
-                    color = Globals.ColorMap.GetValueOrDefault(colorRaw, -1);
+                    color = Global.ColorMap.GetValueOrDefault(colorRaw, -1);
                 }
                 else
                 {
@@ -38,8 +38,8 @@ namespace RainbowMadness.Data
                     // Type/Value | Count
 
                     var valueRaw = lineParts[0];
-                    var type = Globals.TypeMap[valueRaw];
-                    var value = Globals.ValueMap[valueRaw];
+                    var type = Global.TypeMap[valueRaw];
+                    var value = Global.ValueMap[valueRaw];
 
                     int count;
                     try
