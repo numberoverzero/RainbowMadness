@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Engine.DataStructures;
 using Engine.Utility;
 
 namespace RainbowMadness.Data
 {
     public class Game
     {
-        readonly string _deckFileName;
+        private readonly string _deckFileName;
         protected ICollection<Card> Deck;
+        protected int PlayerIndex;
+        protected Player[] Players;
+        protected bool Reverse = false;
+        public GameSettings Settings;
         protected List<Card> Stack;
 
-        protected Player[] Players;
-        protected int PlayerIndex;
-        protected bool Reverse = false;
+        public Game(string deckFileName, GameSettings settings)
+        {
+            _deckFileName = deckFileName;
+            Settings = settings;
+            ResetDeck();
+        }
 
         public Card Top
         {
@@ -25,33 +29,17 @@ namespace RainbowMadness.Data
                     return Card.NullCard;
                 return Stack[Stack.Count - 1];
             }
-            set
-            {
-                Stack.Add(value);
-            }
+            set { Stack.Add(value); }
         }
+
         public Player CurrentPlayer
         {
-            get
-            {
-                return Players[PlayerIndex];
-            }
+            get { return Players[PlayerIndex]; }
         }
+
         public Player NextPlayer
         {
-            get
-            {
-                return Players[NextPlayerIndex()];
-            }
-        }
-
-        public GameSettings Settings;
-
-        public Game(string deckFileName, GameSettings settings)
-        {
-            this._deckFileName = deckFileName;
-            Settings = settings;
-            ResetDeck();
+            get { return Players[NextPlayerIndex()]; }
         }
 
         public Card DrawCard()
@@ -84,6 +72,14 @@ namespace RainbowMadness.Data
         private void ResetDeck()
         {
             Deck = Parsers.ParseDeck(_deckFileName);
+        }
+
+        public void PrintDeck()
+        {
+            foreach (var card in Deck)
+            {
+                Console.WriteLine(card);
+            }
         }
     }
 }
