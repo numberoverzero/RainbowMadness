@@ -52,6 +52,7 @@ namespace RainbowMadness
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             ScreenManager.Initialize(this, Window, GraphicsDevice, Content);
             _game = new Data.Game(@"Content\Decks\cards.txt", ScreenManager.Settings);
+            _game.PrintDeck();
             InitializeInput();
             ScreenManager.OpenScreen(new MainScreen());
         }

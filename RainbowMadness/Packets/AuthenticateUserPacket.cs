@@ -11,8 +11,8 @@ namespace RainbowMadness.Packets
         public override byte[] AsByteArray()
         {
             var b = new ByteArrayBuilder();
-            b.Add(Type.AsByteArray());
-            b.Add(Username.WithTermChar().AsByteArray());
+            b.Add(Type);
+            b.Add(Username);
             return b.GetByteArray();
         }
 
@@ -44,9 +44,9 @@ namespace RainbowMadness.Packets
         public override byte[] AsByteArray()
         {
             var b = new ByteArrayBuilder();
-            b.Add(Type.AsByteArray());
-            b.Add(Success.AsByteArray());
-            b.Add(Username.WithTermChar().AsByteArray());
+            b.Add(Type);
+            b.Add(Success);
+            b.Add(Username);
             return b.GetByteArray();
         }
 
