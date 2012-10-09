@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Engine.Networking;
 
 namespace RainbowMadness.Data
 {
     public class Player
     {
-        List<Card> hand;
-        public Client Client;
+        private readonly List<Card> hand;
+        private readonly Client Client;
+        public string Name;
 
-        public Player(Client client)
+        public Player(Client client, string name)
         {
             hand = new List<Card>();
             Client = client;
+            Name = name;
         }
 
-        public Globals.CardColor GetWildColor()
+        public int GetWildColor()
         {
             throw new NotImplementedException();
         }
@@ -28,6 +28,14 @@ namespace RainbowMadness.Data
                 hand.Add(game.DrawCard());
         }
 
-        //public void 
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == obj.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return Client.GetHashCode();
+        }
     }
 }
