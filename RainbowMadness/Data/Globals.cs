@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Engine.Utility;
 
 namespace RainbowMadness.Data
 {
-    public static class Globals
+    public static class Global
     {
         public static readonly Dictionary<string, int>
             ColorMap = new Dictionary<string, int>
@@ -55,5 +56,35 @@ namespace RainbowMadness.Data
                                {"WildDraw4", 4},
                                {"Swap", -1},
                            };
+
+        public static bool CanPlay(Game game, Player player, Card card, out string response)
+        {
+            response = "This is a valid play.";
+            if (!game.CurrentPlayer.Equals(player))
+            {
+                response = "It is not {0}'s turn.".format(player);
+                return false;
+            }
+
+            var top = game.Top;
+            if(card.IsNumber)
+            {
+                if (card.Color == top.Color)
+                    return true;
+                if (top.IsNumber)
+                {
+                    if (top.Value == card.Value)
+                        return true;
+                    response = "Neither color nor number match.";
+                    return false;
+                }
+                response = "Color does not match.";
+                return false;
+            }
+            
+            if (card.IsWild)
+                return true;
+
+        }
     }
 }
