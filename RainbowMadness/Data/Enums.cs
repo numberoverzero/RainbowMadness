@@ -1,28 +1,59 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace RainbowMadness.Data
 {
-    public static class Globals{
-    public enum CardColor { Blue, Green, Red, Yellow, None};
-    public enum CardValue { Zero, One, Two, Three, Four, Five, Six, Seven, Eight, Nine, None };
-    public enum SpecialCards { Wild, WildDraw4, Draw2, Skip, Reverse, None };
-
-    public static readonly Dictionary<string, CardValue> CardValueMap = new Dictionary<string, CardValue>
+    public static class Globals
     {
-        {"0", CardValue.Zero},
-        {"1", CardValue.One},
-        {"2", CardValue.Two},
-        {"3", CardValue.Three},
-        {"4", CardValue.Four},
-        {"5", CardValue.Five},
-        {"6", CardValue.Six},
-        {"7", CardValue.Seven},
-        {"8", CardValue.Eight},
-        {"9", CardValue.Nine},
-    };
+        public static readonly Dictionary<string, int>
+            ColorMap = new Dictionary<string, int>
+                           {
+                               {"None", -1},
+                               {"Red", 0},
+                               {"Yellow", 1},
+                               {"Green", 2},
+                               {"Blue", 3},
+                           };
+
+        public static readonly Dictionary<string, int>
+            TypeMap = new Dictionary<string, int>
+                          {
+                              {"0", 0},
+                              {"1", 0},
+                              {"2", 0},
+                              {"3", 0},
+                              {"4", 0},
+                              {"5", 0},
+                              {"6", 0},
+                              {"7", 0},
+                              {"8", 0},
+                              {"9", 0},
+                              {"Skip", 1},
+                              {"Reverse", 2},
+                              {"Draw2", 3},
+                              {"Wild", 4},
+                              {"WildDraw4", 4},
+                              {"Swap", 5},
+                          };
+
+        public static readonly Dictionary<string, int>
+            ValueMap = new Dictionary<string, int>
+                           {
+                               {"0", 0},
+                               {"1", 1},
+                               {"2", 2},
+                               {"3", 3},
+                               {"4", 4},
+                               {"5", 5},
+                               {"6", 6},
+                               {"7", 7},
+                               {"8", 8},
+                               {"9", 9},
+                               {"Skip", -1},
+                               {"Reverse", -1},
+                               {"Draw2", 2},
+                               {"Wild", 0},
+                               {"WildDraw4", 4},
+                               {"Swap", -1},
+                           };
     }
 }
