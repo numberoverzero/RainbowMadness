@@ -1,218 +1,109 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Engine.DataStructures;
+using Engine.Serialization;
+using Engine.Utility;
 
 namespace RainbowMadness.Data
 {
-    public class Card
+    public class Card : IByteSerializeable
     {
-        private const string FMT_STR = "{{{0}: {1}, {2}}}";
-        public virtual Globals.CardColor Color { get; set; }
-        public virtual Globals.CardValue Value { get; set; }
+        private const string FmtStr = "{{{0}{1}}}";
+        private static Card _nullCard;
+        private int _color; // 0=None, 1=Red, 2=Yellow, 3=Green, 4=Blue
+        private int _type; // 0=Number, 1=Skip, 2=Reverse, 3=Draw, 4=Wild, 5=SwapHands
+        private int _value; // Number: 0-9 Skip/Reverse: unused Draw: number Wild: draw count Swap: unused
 
-        public Card(){
-            Color = Globals.CardColor.None;
-            Value = Globals.CardValue.None;
+        public Card():this(0,-1,-1){ }
+
+        public Card(int color, int type, int value)
+        {
+            _color = color;
+            _type = type;
+            _value = value;
         }
 
-        public Card(Globals.CardColor color, Globals.CardValue value)
+        public static Card NullCard
         {
-            Color = color;
-            Value = value;
+            get { return _nullCard ?? (_nullCard = new Card(0, -1, -1)); }
+        }
+
+        public byte[] AsByteArray()
+        {
+            var b = new ByteArrayBuilder();
+            b.Add(_color);
+            b.Add(_type);
+            b.Add(_value);
+            return b.GetByteArray();
+        }
+
+        public int FromByteArray(byte[] bytes, int startIndex)
+        {
+            var reader = new ByteArrayReader(bytes, startIndex);
+            _color = reader.ReadInt32();
+            _type = reader.ReadInt32();
+            _value = reader.ReadInt32();
+            return reader.Index;
+        }
+
+        public Card Copy()
+        {
+            return new Card(_color, _type, _value);
         }
 
         public virtual bool CanPlay(Game game)
         {
-            if (Color == Globals.CardColor.None || Value == Globals.CardValue.None) 
-                return false;
-            
-            Card top = game.Top;
-            if (top.Color == this.Color)
-                return true;
-            if (top.Value == this.Value)
-                return true;
-            return false;
-        }
-
-        public virtual bool Play(Game game)
-        {
-            if (!CanPlay(game))
-                return false;
-            game.Top = this;
-            return true;
-        }
-
-        public virtual Card Copy()
-        {
-            Card card = _copy();
-            CopyDataInto(card);
-            return card;
-        }
-
-        protected virtual void CopyDataInto(Card card)
-        {
-            card.Color = this.Color;
-            card.Value = this.Value;
-        }
-
-        protected virtual Card _copy()
-        {
-            return new Card();
-        }
-
-        static Card nullCard = new Card();
-        public static Card NullCard
-        {
-            get { return nullCard; }
+            throw new NotImplementedException();
         }
 
         public override string ToString()
         {
-            return String.Format(FMT_STR, this.GetType(), Color, Value);
-        }
-    }
-
-    public class WildCard : Card
-    {
-        bool _choosingColor = false;
-        public override Globals.CardColor Color
-        {
-            get { return base.Color; }
-            set 
+            string color;
+            switch(_color)
             {
-                if (_choosingColor) base.Color = value;
-                else base.Color = Globals.CardColor.None;
+                default:
+                    color = "";
+                    break;
+                case 0:
+                    color = "Red";
+                    break;
+                case 1:
+                    color = "Yellow";
+                    break;
+                case 2:
+                    color = "Green";
+                    break;
+                case 3:
+                    color = "Blue";
+                    break;
             }
-        }
-        public override bool CanPlay(Game game)
-        {
-            return true;
-        }
-
-        public override bool Play(Game game)
-        {
-            _choosingColor = true;
-            Color = game.CurrentPlayer.GetWildColor();
-            _choosingColor = false;
-            return base.Play(game);
-        }
-
-        protected override Card _copy()
-        {
-            return new WildCard();
-        }
-    }
-
-    public class WildDraw4Card : WildCard
-    {
-        public override bool Play(Game game)
-        {
-            bool played = base.Play(game);
-            if (played)
-                game.NextPlayer.DrawCard(game, 4);
-            return played;
-        }
-
-        protected override Card _copy()
-        {
-            return new WildDraw4Card();
-        }
-    }
-
-    public class SkipCard : Card
-    {
-        public SkipCard() : base() { }
-        public SkipCard(Globals.CardColor color) : base(color, Globals.CardValue.None) { }
-
-        public override bool CanPlay(Game game)
-        {
-            if (Color == Globals.CardColor.None)
-                return false;
-
-            Card top = game.Top;
-            if (Color == top.Color)
-                return true;
-            var topIsSkip = (top as SkipCard) != null;
-            return topIsSkip;
-        }
-        
-        public override bool Play(Game game)
-        {
-            bool played = base.Play(game);
-            if (played)
+            string name;
+            switch(_type)
             {
-                game.AdvancePlayer();
-                game.AdvancePlayer();
+                default:
+                    name = "UnknownCard";
+                    break;
+                case 0:
+                    name = ""+_value;
+                    break;
+                case 1:
+                    name = "Skip";
+                    break;
+                case 2:
+                    name = "Reverse";
+                    break;
+                case 3:
+                    name = "Draw"+_value;
+                    break;
+                case 4:
+                    name = "Wild" + (_value > 0 ? "Draw"+_value : "");
+                    break;
+                case 5:
+                    name = "SwapHand";
+                    break;
+
             }
-            return played;
-        }
-
-        protected override Card _copy()
-        {
-            return new SkipCard();
-        }
-    }
-
-    public class ReverseCard : Card
-    {
-        public ReverseCard() : base() { }
-        public ReverseCard(Globals.CardColor color) : base(color, Globals.CardValue.None) { }
-
-        public override bool CanPlay(Game game)
-        {
-            if (Color == Globals.CardColor.None)
-                return false;
-
-            Card top = game.Top;
-            if (Color == top.Color)
-                return true;
-            var topIsReverse = (top as ReverseCard) != null;
-            return topIsReverse;
-        }
-
-        public override bool Play(Game game)
-        {
-            bool played = base.Play(game);
-            if (played)
-                game.ReversePlayDirection();
-            return played;
-        }
-
-        protected override Card _copy()
-        {
-            return new SkipCard();
-        }
-    }
-
-    public class Draw2Card : Card
-    {
-        public Draw2Card() : base() { }
-        public Draw2Card(Globals.CardColor color) : base(color, Globals.CardValue.None) { }
-
-        public override bool CanPlay(Game game)
-        {
-            if (Color == Globals.CardColor.None)
-                return false;
-
-            Card top = game.Top;
-            if (Color == top.Color)
-                return true;
-            var topIsDrawTwo = (top as Draw2Card) != null;
-            return topIsDrawTwo;
-        }
-
-        public override bool Play(Game game)
-        {
-            bool played = base.Play(game);
-            if (played)
-                game.NextPlayer.DrawCard(game, 2);
-            return played;
-        }
-
-        protected override Card _copy()
-        {
-            return new Draw2Card();
+            if (color != "") color = color + " ";
+            return FmtStr.format(color, name);
         }
     }
 }
