@@ -80,7 +80,7 @@
   <ItemGroup>
     <Compile Include="ClientServer\GameServer.cs" />
     <Compile Include="Data\Card.cs" />
-    <Compile Include="Data\Enums.cs" />
+    <Compile Include="Data\Globals.cs" />
     <Compile Include="Data\Game.cs" />
     <Compile Include="Data\GameSettings.cs" />
     <Compile Include="Data\Parsers.cs" />
