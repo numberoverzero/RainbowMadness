@@ -8,15 +8,23 @@ namespace RainbowMadness.Packets
     {
         private static readonly BidirectionalDict<string, int> Mapping = new BidirectionalDict<string, int>();
 
+        private static int _nextType;
+
         public static void Initialize()
         {
             Packet.GetTypeFunction = TypeFunc;
             Packet.GetNameFunction = NameFunc;
             Packet.BuildPacketFunction = ToPacket;
-            Mapping.Add(0000, "NullPacket");
-            Mapping.Add(0001, "ChatPacket");
-            Mapping.Add(0002, "AuthenticateUserPacket");
-            Mapping.Add(0003, "AuthenticateUserResponsePacket");
+            AddPacket("NullPacket");
+            AddPacket("ChatPacket");
+            AddPacket("AuthenticateUserPacket");
+            AddPacket("AuthenticateUserResponsePacket");
+        }
+
+        private static void AddPacket(string packetName)
+        {
+            Mapping.Add(_nextType, packetName);
+            _nextType++;
         }
 
         public static int TypeFunc(string packetName)
