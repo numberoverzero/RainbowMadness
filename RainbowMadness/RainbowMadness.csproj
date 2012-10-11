@@ -94,6 +94,7 @@
     <Compile Include="Packets\AuthenticateUserPacket.cs" />
     <Compile Include="Packets\CardPackets.cs" />
     <Compile Include="Packets\ChatPacket.cs" />
+    <Compile Include="Packets\GameStatePackets.cs" />
     <Compile Include="Packets\PacketGlobals.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Main.cs" />
