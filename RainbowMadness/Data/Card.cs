@@ -9,7 +9,7 @@ namespace RainbowMadness.Data
         private const string FmtStr = "{{{0}{1}}}";
         private static Card _nullCard;
         public int Color; // 0=None, 1=Red, 2=Yellow, 3=Green, 4=Blue
-        private int _type; // 0=Number, 1=Skip, 2=Reverse, 3=Draw, 4=Wild, 5=SwapHands
+        public int Type; // 0=Number, 1=Skip, 2=Reverse, 3=Draw, 4=Wild, 5=SwapHands
         public int Value; // Number: 0-9 Skip/Reverse: unused Draw: number Wild: draw count Swap: unused
 
         public Card() : this(0, -1, -1)
@@ -19,7 +19,7 @@ namespace RainbowMadness.Data
         public Card(int color, int type, int value)
         {
             Color = color;
-            _type = type;
+            Type = type;
             Value = value;
         }
 
@@ -31,32 +31,32 @@ namespace RainbowMadness.Data
 
         public bool IsSkip
         {
-            get { return _type == 1; }
+            get { return Type == 1; }
         }
 
         public bool IsReverse
         {
-            get { return _type == 2; }
+            get { return Type == 2; }
         }
 
         public bool IsDraw
         {
-            get { return _type == 3; }
+            get { return Type == 3; }
         }
 
         public bool IsWild
         {
-            get { return _type == 4; }
+            get { return Type == 4; }
         }
 
         public bool IsSwap
         {
-            get { return _type == 5; }
+            get { return Type == 5; }
         }
 
         public bool IsNumber
         {
-            get { return _type == 0; }
+            get { return Type == 0; }
         }
 
         public bool IsRed
@@ -85,7 +85,7 @@ namespace RainbowMadness.Data
         {
             var b = new ByteArrayBuilder();
             b.Add(Color);
-            b.Add(_type);
+            b.Add(Type);
             b.Add(Value);
             return b.GetByteArray();
         }
@@ -94,7 +94,7 @@ namespace RainbowMadness.Data
         {
             var reader = new ByteArrayReader(bytes, startIndex);
             Color = reader.ReadInt32();
-            _type = reader.ReadInt32();
+            Type = reader.ReadInt32();
             Value = reader.ReadInt32();
             return reader.Index;
         }
@@ -103,7 +103,7 @@ namespace RainbowMadness.Data
 
         public Card Copy()
         {
-            return new Card(Color, _type, Value);
+            return new Card(Color, Type, Value);
         }
 
         public virtual bool CanPlay(Game game)
@@ -133,7 +133,7 @@ namespace RainbowMadness.Data
                     break;
             }
             string name;
-            switch (_type)
+            switch (Type)
             {
                 default:
                     name = "UnknownCard";
@@ -159,6 +159,35 @@ namespace RainbowMadness.Data
             }
             if (color != "") color = color + " ";
             return FmtStr.format(color, name);
+        }
+
+        public static bool CanPlay(Game game, Player player, Card card, out string response)
+        {
+            response = "This is a valid play.";
+            var top = game.Top;
+
+            if (!game.CurrentPlayer.Equals(player))
+            {
+                response = "It is not {0}'s turn.".format(player);
+                return false;
+            }
+
+            if (card.IsWild)
+                return true;
+
+            if (card.Color == top.Color)
+                return true;
+
+            // From here on out, the card has a different color from the top
+            if (card.Type == top.Type)
+            {
+                if (card.Value == top.Value)
+                    return true;
+                response = "Cards are the same type but have different value.";
+                return false;
+            }
+            response = "Cards have different color and type.";
+            return false;
         }
     }
 }
