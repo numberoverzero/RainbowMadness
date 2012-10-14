@@ -4,13 +4,16 @@ using Engine.Networking;
 
 namespace RainbowMadness.Data
 {
-    public class Player
+    /// <summary>
+    /// This class shouldn't be needed.
+    /// </summary>
+    public class _Player
     {
         private readonly List<Card> hand;
         private readonly Client Client;
         public string Name;
 
-        public Player(Client client, string name)
+        public _Player(Client client, string name)
         {
             hand = new List<Card>();
             Client = client;

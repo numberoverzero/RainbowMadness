@@ -9,7 +9,7 @@ namespace RainbowMadness.Data
         private readonly string _deckFileName;
         protected ICollection<Card> Deck;
         protected int PlayerIndex;
-        protected Player[] Players;
+        protected List<String> Players;
         protected bool Reverse = false;
         public GameSettings Settings;
         protected List<Card> Stack;
@@ -19,6 +19,7 @@ namespace RainbowMadness.Data
             _deckFileName = deckFileName;
             Settings = settings;
             ResetDeck();
+            Players = new List<string>();
         }
 
         public Card Top
@@ -32,12 +33,17 @@ namespace RainbowMadness.Data
             set { Stack.Add(value); }
         }
 
-        public Player CurrentPlayer
+        public void AddPlayer(String player)
+        {
+            Players.Add(player);
+        }
+
+        public String CurrentPlayer
         {
             get { return Players[PlayerIndex]; }
         }
 
-        public Player NextPlayer
+        public String NextPlayer
         {
             get { return Players[NextPlayerIndex()]; }
         }
