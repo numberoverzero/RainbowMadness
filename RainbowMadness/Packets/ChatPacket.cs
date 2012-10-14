@@ -8,19 +8,15 @@ namespace RainbowMadness.Packets
     {
         public string Message { get; set; }
 
-        public override byte[] AsByteArray()
+        public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
-            var b = new ByteArrayBuilder();
-            b.Add(Type);
-            b.Add(Message);
-            return b.GetByteArray();
+            base.BuildAsByteArray(builder);
+            builder.Add(Message);
         }
 
-        public override int FromByteArray(byte[] bytes, int startIndex)
+        protected override int ReadFromByteArray(ByteArrayReader reader)
         {
-            // Type | Message
-            var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32();
+            base.ReadFromByteArray(reader);
             Message = reader.ReadString();
             return reader.Index;
         }

@@ -8,32 +8,19 @@ namespace RainbowMadness.Packets
     {
         public string Username { get; set; }
 
-        public override byte[] AsByteArray()
+        public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
-            var b = new ByteArrayBuilder();
-            b.Add(Type);
-            b.Add(Username);
-            return b.GetByteArray();
+            base.BuildAsByteArray(builder);
+            builder.Add(Username);
         }
 
-        /// <summary>
-        /// <para>
-        /// Returns the position of the last character of the object in the byte array.
-        /// </para>
-        /// <para>
-        /// Returns a number less than startIndex if the object does not start at the given index.
-        /// </para>
-        /// </summary>
-        /// <param name="bytes"/><param name="startIndex"/>
-        /// <returns/>
-        public override int FromByteArray(byte[] bytes, int startIndex)
+        protected override int ReadFromByteArray(ByteArrayReader reader)
         {
-            // Type | Message
-            var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32();
+            base.ReadFromByteArray(reader);
             Username = reader.ReadString();
             return reader.Index;
         }
+        
     }
 
     public class AuthenticateUserResponsePacket : Packet
@@ -41,24 +28,20 @@ namespace RainbowMadness.Packets
         public string Username { get; set; }
         public bool Success { get; set; }
 
-        public override byte[] AsByteArray()
+        public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
-            var b = new ByteArrayBuilder();
-            b.Add(Type);
-            b.Add(Success);
-            b.Add(Username);
-            return b.GetByteArray();
+            base.BuildAsByteArray(builder);
+            builder.Add(Username);
+            builder.Add(Success);
         }
 
-        public override int FromByteArray(byte[] bytes, int startIndex)
+        protected override int ReadFromByteArray(ByteArrayReader reader)
         {
-            // Type | Success | Message
-
-            var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32();
-            Success = reader.ReadBool();
+            base.ReadFromByteArray(reader);
             Username = reader.ReadString();
+            Success = reader.ReadBool();
             return reader.Index;
         }
+        
     }
 }

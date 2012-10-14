@@ -4,7 +4,7 @@ using Engine.Serialization;
 using Engine.Utility;
 namespace RainbowMadness.Data
 {
-    public class Card : IByteSerializeable
+    public class Card : ByteSerializeable
     {
         private const string FmtStr = "{{{0}{1}}}";
         private static Card _nullCard;
@@ -81,18 +81,15 @@ namespace RainbowMadness.Data
 
         #region IByteSerializeable Members
 
-        public byte[] AsByteArray()
+        public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
-            var b = new ByteArrayBuilder();
-            b.Add(Color);
-            b.Add(Type);
-            b.Add(Value);
-            return b.GetByteArray();
+            builder.Add(Color);
+            builder.Add(Type);
+            builder.Add(Value);
         }
 
-        public int FromByteArray(byte[] bytes, int startIndex)
+        protected override int ReadFromByteArray(ByteArrayReader reader)
         {
-            var reader = new ByteArrayReader(bytes, startIndex);
             Color = reader.ReadInt32();
             Type = reader.ReadInt32();
             Value = reader.ReadInt32();
@@ -161,7 +158,7 @@ namespace RainbowMadness.Data
             return FmtStr.format(color, name);
         }
 
-        public static bool CanPlay(Game game, Player player, Card card, out string response)
+        public static bool CanPlay(Game game, String player, Card card, out string response)
         {
             response = "This is a valid play.";
             var top = game.Top;

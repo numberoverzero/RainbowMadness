@@ -8,20 +8,6 @@ namespace RainbowMadness.Packets
 {
     public class DrawCardRequestPacket : Packet
     {
-        public override byte[] AsByteArray()
-        {
-            var b = new ByteArrayBuilder();
-            b.Add(Type);
-            return b.GetByteArray();
-        }
-
-        public override int FromByteArray(byte[] bytes, int startIndex)
-        {
-            // Type
-            var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32();
-            return reader.Index;
-        }
     }
 
     public class DrawCardResponsePacket : Packet
@@ -30,64 +16,20 @@ namespace RainbowMadness.Packets
         public bool IsCardDrawn;
         public string Reason;
 
-        public override byte[] AsByteArray()
+        public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
-            var b = new ByteArrayBuilder();
-            b.Add(Type);
-            b.Add(Card);
-            b.Add(IsCardDrawn);
-            b.Add(Reason);
-            return b.GetByteArray();
+            base.BuildAsByteArray(builder);
+            builder.Add(Card);
+            builder.Add(IsCardDrawn);
+            builder.Add(Reason);
         }
 
-        public override int FromByteArray(byte[] bytes, int startIndex)
+        protected override int ReadFromByteArray(ByteArrayReader reader)
         {
-            // Type | Card | IsCardDrawn | Reason
-            var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32();
-            Card = reader.Read<Card>(); 
+            base.ReadFromByteArray(reader);
+            Card = reader.Read<Card>();
             IsCardDrawn = reader.ReadBool();
             Reason = reader.ReadString();
-            return reader.Index;
-        }
-    }
-
-    public class TopCardRequestPacket : Packet
-    {
-        public override byte[] AsByteArray()
-        {
-            var b = new ByteArrayBuilder();
-            b.Add(Type);
-            return b.GetByteArray();
-        }
-
-        public override int FromByteArray(byte[] bytes, int startIndex)
-        {
-            // Type
-            var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32();
-            return reader.Index;
-        }
-    }
-
-    public class TopCardResponsePacket : Packet
-    {
-        public Card Card;
-
-        public override byte[] AsByteArray()
-        {
-            var b = new ByteArrayBuilder();
-            b.Add(Type);
-            b.Add(Card);
-            return b.GetByteArray();
-        }
-
-        public override int FromByteArray(byte[] bytes, int startIndex)
-        {
-            // Type | Card
-            var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32();
-            Card = reader.Read<Card>();
             return reader.Index;
         }
     }
@@ -96,19 +38,15 @@ namespace RainbowMadness.Packets
     {
         public string PlayerName;
 
-        public override byte[] AsByteArray()
+        public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
-            var b = new ByteArrayBuilder();
-            b.Add(Type);
-            b.Add(PlayerName);
-            return b.GetByteArray();
+            base.BuildAsByteArray(builder);
+            builder.Add(PlayerName);
         }
 
-        public override int FromByteArray(byte[] bytes, int startIndex)
+        protected override int ReadFromByteArray(ByteArrayReader reader)
         {
-            // Type
-            var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32();
+            base.ReadFromByteArray(reader);
             PlayerName = reader.ReadString();
             return reader.Index;
         }
@@ -120,23 +58,59 @@ namespace RainbowMadness.Packets
         public string PlayerName;
         public List<Card> Cards;
 
-        public override byte[] AsByteArray()
+        public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
-            var b = new ByteArrayBuilder();
-            b.Add(IsValidRequest);
-            b.Add(PlayerName);
-            b.Add(Cards);
-            return b.GetByteArray();
+            base.BuildAsByteArray(builder);
+            builder.Add(IsValidRequest);
+            builder.Add(PlayerName);
+            builder.Add(Cards);
         }
 
-        public override int FromByteArray(byte[] bytes, int startIndex)
+        protected override int ReadFromByteArray(ByteArrayReader reader)
         {
-            // Type | IsValid | Name | Cards
-            var reader = new ByteArrayReader(bytes, startIndex);
-            reader.ReadInt32();
+            base.ReadFromByteArray(reader);
             IsValidRequest = reader.ReadBool();
             PlayerName = reader.ReadString();
             Cards = reader.ReadList<Card>();
+            return reader.Index;
+        }
+    }
+
+    public class PlayCardRequestPacket : Packet
+    {
+        public Card Card;
+
+        public override void BuildAsByteArray(ByteArrayBuilder builder)
+        {
+            base.BuildAsByteArray(builder);
+            builder.Add(Card);
+        }
+
+        protected override int ReadFromByteArray(ByteArrayReader reader)
+        {
+            base.ReadFromByteArray(reader);
+            Card = reader.Read<Card>();
+            return reader.Index;
+        }
+    }
+
+    public class PlayCardResponsePacket : Packet
+    {
+        public bool IsPlayed;
+        public String Message;
+
+        public override void BuildAsByteArray(ByteArrayBuilder builder)
+        {
+            base.BuildAsByteArray(builder);
+            builder.Add(IsPlayed);
+            builder.Add(Message);
+        }
+
+        protected override int ReadFromByteArray(ByteArrayReader reader)
+        {
+            base.ReadFromByteArray(reader);
+            IsPlayed = reader.ReadBool();
+            Message = reader.ReadString();
             return reader.Index;
         }
     }
