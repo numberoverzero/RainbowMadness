@@ -8,6 +8,11 @@ namespace RainbowMadness.Packets
     {
         public string Username { get; set; }
 
+        public override Packet Copy()
+        {
+            return new AuthenticateUserPacket();
+        }
+
         public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
             base.BuildAsByteArray(builder);
@@ -27,6 +32,11 @@ namespace RainbowMadness.Packets
     {
         public string Username { get; set; }
         public bool Success { get; set; }
+
+        public override Packet Copy()
+        {
+            return new AuthenticateUserResponsePacket();
+        }
 
         public override void BuildAsByteArray(ByteArrayBuilder builder)
         {

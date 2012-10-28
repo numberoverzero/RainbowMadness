@@ -8,6 +8,10 @@ namespace RainbowMadness.Packets
 {
     public class DrawCardRequestPacket : Packet
     {
+        public override Packet Copy()
+        {
+            return new DrawCardRequestPacket();
+        }
     }
 
     public class DrawCardResponsePacket : Packet
@@ -15,6 +19,11 @@ namespace RainbowMadness.Packets
         public Card Card;
         public bool IsCardDrawn;
         public string Reason;
+
+        public override Packet Copy()
+        {
+            return new DrawCardResponsePacket();
+        }
 
         public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
@@ -38,6 +47,11 @@ namespace RainbowMadness.Packets
     {
         public string PlayerName;
 
+        public override Packet Copy()
+        {
+            return new PlayerHandRequestPacket();
+        }
+
         public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
             base.BuildAsByteArray(builder);
@@ -57,6 +71,11 @@ namespace RainbowMadness.Packets
         public bool IsValidRequest;
         public string PlayerName;
         public List<Card> Cards;
+
+        public override Packet Copy()
+        {
+            return new PlayerHandResponsePacket();
+        }
 
         public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
@@ -80,6 +99,11 @@ namespace RainbowMadness.Packets
     {
         public Card Card;
 
+        public override Packet Copy()
+        {
+            return new PlayCardRequestPacket();
+        }
+
         public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
             base.BuildAsByteArray(builder);
@@ -98,6 +122,11 @@ namespace RainbowMadness.Packets
     {
         public bool IsPlayed;
         public String Message;
+
+        public override Packet Copy()
+        {
+            return new PlayCardResponsePacket();
+        }
 
         public override void BuildAsByteArray(ByteArrayBuilder builder)
         {

@@ -8,6 +8,11 @@ namespace RainbowMadness.Packets
     {
         public string Message { get; set; }
 
+        public override Packet Copy()
+        {
+            return new ChatPacket();
+        }
+
         public override void BuildAsByteArray(ByteArrayBuilder builder)
         {
             base.BuildAsByteArray(builder);
