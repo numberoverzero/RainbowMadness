@@ -86,7 +86,11 @@
     <Compile Include="Data\Parsers.cs" />
     <Compile Include="Data\Player.cs" />
     <Compile Include="Menus\Components.cs" />
-    <Compile Include="Menus\CustomMenus.cs" />
+    <Compile Include="Menus\Game Specific Menus\HostScreen.cs" />
+    <Compile Include="Menus\Game Specific Menus\ServerSettingsMenu.cs" />
+    <Compile Include="Menus\Game Specific Menus\SettingsScreen.cs" />
+    <Compile Include="Menus\Game Specific Menus\GameScreen.cs" />
+    <Compile Include="Menus\Game Specific Menus\MainScreen.cs" />
     <Compile Include="Menus\ScreenManager.cs" />
     <Compile Include="Menus\PopupScreen.cs" />
     <Compile Include="Menus\MenuScreens.cs" />

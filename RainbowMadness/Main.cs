@@ -1,9 +1,13 @@
 using System;
 using Engine.Input.Managers.AddBindings;
+using Engine.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RainbowMadness.Data;
+using RainbowMadness.Menus;
 using RainbowMadness.Packets;
+using Game = Microsoft.Xna.Framework.Game;
 
 namespace RainbowMadness
 {
@@ -50,10 +54,14 @@ namespace RainbowMadness
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            ScreenManager.Initialize(this, Window, GraphicsDevice, Content);
+            ScreenManager.Initialize(this, Window, _graphics, Content);
+            RainbowMadness.Data.Game.Initialize(Content);
+            BasicShapeRenderer.Initialize(GraphicsDevice);
+            IsMouseVisible = true;
             _game = new Data.Game(@"Content\Decks\cards.txt", ScreenManager.Settings);
             _game.PrintDeck();
             InitializeInput();
+            Card.LoadContent(Content);
             ScreenManager.OpenScreen(new MainScreen());
         }
 

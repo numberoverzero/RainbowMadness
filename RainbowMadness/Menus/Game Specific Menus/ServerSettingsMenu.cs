@@ -2,20 +2,22 @@
 using Engine.Input.Managers.SinglePlayer;
 using Engine.Utility;
 using Microsoft.Xna.Framework.Graphics;
+using RainbowMadness.Data;
+using RainbowMadness.Menus;
 
 namespace RainbowMadness
 {
-    public class JoinScreen : IScreen
+    public class ServerSettingsMenu : IScreen
     {
-        private readonly InputTextBox _server;
-        private readonly InputTextBox _username;
+        protected readonly InputTextBox Server;
+        protected readonly InputTextBox Username;
 
-        public JoinScreen()
+        public ServerSettingsMenu()
         {
             var x = (int) (0.1f*ScreenManager.Dimensions.X);
             var y = (int) (0.1f*ScreenManager.Dimensions.Y);
             var width = (int) (0.75f*ScreenManager.Dimensions.X);
-            _server = new InputTextBox
+            Server = new InputTextBox
                           {
                               Label = "Server  ",
                               Delimeter = " ",
@@ -25,18 +27,18 @@ namespace RainbowMadness
                               Y = y,
                               MinimumWidth = width
                           };
-            _username = new InputTextBox
+            Username = new InputTextBox
                             {
-                                Label = "Username",
+                                Label = "LocalPlayer",
                                 Delimeter = " ",
                                 Highlighted = false,
                                 GradientBackground = true,
                                 X = x,
-                                Y = (int) (y + _server.Height*1.15f),
+                                Y = (int) (y + Server.Height*1.15f),
                                 MinimumWidth = width
                             };
-            _server.Input = ScreenManager.Settings.JoinServer;
-            _username.Input = ScreenManager.Settings.Username;
+            Server.Input = ScreenManager.Settings.ServerName;
+            Username.Input = ScreenManager.Settings.LocalPlayer;
         }
 
         #region IScreen Members
@@ -48,19 +50,19 @@ namespace RainbowMadness
 
         public void Draw(SpriteBatch batch)
         {
-            _server.Draw(batch);
-            _username.Draw(batch);
+            Server.Draw(batch);
+            Username.Draw(batch);
         }
 
         public void Update(float dt)
         {
-            _server.Update(dt);
-            _username.Update(dt);
+            Server.Update(dt);
+            Username.Update(dt);
             var input = ScreenManager.Input;
             if (input.IsPressed("menu_up") || input.IsPressed("menu_down"))
             {
-                _server.Highlighted = !_server.Highlighted;
-                _username.Highlighted = !_username.Highlighted;
+                Server.Highlighted = !Server.Highlighted;
+                Username.Highlighted = !Username.Highlighted;
             }
             if (input.IsPressed("menu_select"))
                 OnSelect();
@@ -70,20 +72,39 @@ namespace RainbowMadness
 
         #endregion
 
-        protected void OnSelect(string server, string password)
+        protected virtual void OnSelect()
         {
-            Console.WriteLine("Server: {0}, Password: {1}".format(_server.Text, _username.Text));
+            ScreenManager.Settings.ServerName = Server.Input;
+            ScreenManager.Settings.LocalPlayer = Username.Input;
+            ScreenManager.CloseScreen(this);
+
+            var game = new Game(@"Content\Decks\cards.txt", ScreenManager.Settings);
+            ScreenManager.OpenScreen(new GameScreen(game));
         }
 
-        private void OnClose()
+        protected virtual void OnClose()
         {
             ScreenManager.CloseScreen(this);
-            ScreenManager.Settings.JoinServer = _server.Input;
-            ScreenManager.Settings.Username = _username.Input;
-        }
-
-        private void OnSelect()
-        {
         }
     }
+
+    public class JoinScreen : ServerSettingsMenu
+    {
+        protected override void OnSelect()
+        {
+            ScreenManager.Settings.IsHost = false;
+            base.OnSelect();
+        }
+    }
+
+    public class HostServerScreen : ServerSettingsMenu
+    {
+        protected override void OnSelect()
+        {
+            ScreenManager.Settings.IsHost = true;
+            base.OnSelect();
+        }
+    }
+
+
 }

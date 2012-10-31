@@ -11,9 +11,9 @@ namespace RainbowMadness.Data
         private const String HeaderPattern = @"\[(?<header>[^\]]*)\]";
         private static readonly Regex HeaderRegex = new Regex(HeaderPattern);
 
-        public static ICollection<Card> ParseDeck(string filename)
+        public static CountedCollection<Card> ParseDeck(string filename)
         {
-            ICollection<Card> deck = new CountedCollection<Card>();
+            var deck = new CountedCollection<Card>();
 
 
             var color = -1;

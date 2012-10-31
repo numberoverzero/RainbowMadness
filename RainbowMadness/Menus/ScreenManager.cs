@@ -15,13 +15,21 @@ namespace RainbowMadness
         public static SpriteFont Font;
         public static OptimizedKeyboardManager Input = new OptimizedKeyboardManager();
         public static float VerticalSpace;
-        public static Vector2 Dimensions;
+        
+        public static GraphicsDeviceManager DeviceManager;
         public static GraphicsDevice Device;
         public static ContentManager Content;
         public static Game Game;
         public static GameSettings Settings = new GameSettings();
         private static readonly Color BackgroundColor = Color.Black;
 
+        public static Vector2 Dimensions
+        {
+            get
+            {
+                return new Vector2(Settings.Resolution.X, Settings.Resolution.Y);
+            }
+        }
         public static void OpenScreen(IScreen screen)
         {
             Screens.Add(screen);
@@ -57,15 +65,24 @@ namespace RainbowMadness
             Screens[Screens.Count - 1].Update(dt);
         }
 
-        public static void Initialize(Game game, GameWindow window, GraphicsDevice device, ContentManager content)
+        public static void Initialize(Game game, GameWindow window, GraphicsDeviceManager deviceManager, ContentManager content)
         {
             Game = game;
-            Device = device;
+            DeviceManager = deviceManager;
+            Device = deviceManager.GraphicsDevice;
             Content = content;
             Font = Content.Load<SpriteFont>("font");
-            Dimensions = new Vector2(Device.Viewport.Width, Device.Viewport.Height);
             KeyboardDispatcher.Initialize(window);
             VerticalSpace = Font.MeasureString("I").Y;
+            RefreshSettings();
+        }
+
+        public static void RefreshSettings()
+        {
+            var res = Settings.Resolution;
+            DeviceManager.PreferredBackBufferHeight = res.Y;
+            DeviceManager.PreferredBackBufferWidth = res.X;
+            DeviceManager.ApplyChanges();
         }
     }
 }

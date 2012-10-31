@@ -1,16 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using Engine.DataStructures;
 using Engine.Serialization;
 using Engine.Utility;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+
 namespace RainbowMadness.Data
 {
-    public class Card : ByteSerializeable
+    public class Card : ByteSerializeable, IEquatable<Card>
     {
         private const string FmtStr = "{{{0}{1}}}";
         private static Card _nullCard;
         public int Color; // 0=None, 1=Red, 2=Yellow, 3=Green, 4=Blue
         public int Type; // 0=Number, 1=Skip, 2=Reverse, 3=Draw, 4=Wild, 5=SwapHands
         public int Value; // Number: 0-9 Skip/Reverse: unused Draw: number Wild: draw count Swap: unused
+        private static Texture2D _cardTexture;
+
+        public static void LoadContent(ContentManager content)
+        {
+            _cardTexture = content.Load<Texture2D>(@"Cards\card");
+        }
 
         public Card() : this(0, -1, -1)
         {
@@ -108,6 +119,20 @@ namespace RainbowMadness.Data
             throw new NotImplementedException();
         }
 
+        public bool Equals(Card other)
+        {
+            return (Color == other.Color) && (Type == other.Type) && (Value == other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 23;
+            hash = hash*31 + Color;
+            hash = hash * 31 + Type;
+            hash = hash * 31 + Value;
+            return hash;
+        }
+
         public override string ToString()
         {
             string color;
@@ -185,6 +210,19 @@ namespace RainbowMadness.Data
             }
             response = "Cards have different color and type.";
             return false;
+        }
+
+        /// <summary>
+        /// Draw the card, centered at pos
+        /// </summary>
+        public void Draw(SpriteBatch batch, Vector2 pos, float scale)
+        {
+            batch.Draw(_cardTexture, pos, null, Microsoft.Xna.Framework.Color.White, 0, new Vector2(-0.5f), scale, SpriteEffects.None, 0);
+        }
+
+        public static Vector2 GraphicDimensions
+        {
+            get { return _cardTexture.Dimensions(); }
         }
     }
 }

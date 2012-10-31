@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 
 namespace RainbowMadness.Data
 {
@@ -11,7 +8,16 @@ namespace RainbowMadness.Data
         public int NPlayers { get; set; }
         public bool DrawUntilPlayable { get; set; }
         public bool CanPlayAfterDraw { get; set; }
-        public string JoinServer { get; set; }
-        public string Username { get; set; }
+        public string ServerName { get; set; }
+        public string LocalPlayer { get; set; }
+        public bool IsHost { get; set; }
+        public Point Resolution { get; set; }
+        public int CardsPerStartingHand { get; set; }
+
+        public GameSettings()
+        {
+            Resolution = new Point(1024, 768);
+            CardsPerStartingHand = 7;
+        }
     }
 }

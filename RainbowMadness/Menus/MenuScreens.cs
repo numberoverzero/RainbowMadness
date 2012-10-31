@@ -5,7 +5,7 @@ using Engine.Input.Managers.SinglePlayer;
 using Engine.Utility;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace RainbowMadness
+namespace RainbowMadness.Menus
 {
     public abstract class MenuScreen<TTextBox> : IScreen where TTextBox : TextBox, new()
     {
@@ -150,99 +150,6 @@ namespace RainbowMadness
                 box.Description = Descriptions[i];
                 box.Options = OptionLists[i];
             }
-        }
-    }
-
-    public class MainScreen : MenuScreen<TextBox>
-    {
-        public MainScreen()
-        {
-            AddOption("Host Game");
-            AddOption("Join Game");
-            AddOption("Settings");
-        }
-
-        protected override void OnSelect(int index)
-        {
-            switch (index)
-            {
-                case 0:
-                    ScreenManager.OpenScreen(new HostScreen());
-                    break;
-                case 1:
-                    ScreenManager.OpenScreen(new JoinScreen());
-                    break;
-                case 2:
-                    ScreenManager.OpenScreen(new SettingsScreen());
-                    break;
-            }
-        }
-
-        protected override void OnToggle(int index)
-        {
-        }
-
-        protected override void OnClose()
-        {
-            ScreenManager.OpenScreen(new ConfirmDialog(false)
-                             {
-                                 Message = "Really quit?",
-                                 Confirm = "Yes",
-                                 Cancel = "No",
-                                 OnConfirm = () => ScreenManager.CloseScreen(this)
-                             });
-        }
-    }
-
-    public class SettingsScreen : OptionMenuScreen
-    {
-        public SettingsScreen()
-        {
-            AddOption("Colorblind Mode [{0}]", "on", "off");
-            OptionBoxes[0].OptionIndex = ScreenManager.Settings.ColorblindMode ? 0 : 1;
-        }
-
-        protected override void OnSelect(int index)
-        {
-            OnClose();
-        }
-
-        protected override void OnClose()
-        {
-            base.OnClose();
-            ScreenManager.Settings.ColorblindMode = OptionBoxes[0].OptionIndex == 0;
-        }
-    }
-
-    public class HostScreen : OptionMenuScreen
-    {
-        public HostScreen()
-        {
-            AddOption("[{0}] players", "2", "3", "4", "5", "6", "7");
-            var npStr = ScreenManager.Settings.NPlayers.ToString();
-            OptionBoxes[0].OptionIndex = OptionBoxes[0].Options.Contains(npStr)
-                                             ? OptionBoxes[0].Options.IndexOf(npStr)
-                                             : 0;
-
-            AddOption("When I can't play a card, I must [{0}]", "draw one", "draw until I get a playable card");
-            OptionBoxes[1].OptionIndex = ScreenManager.Settings.DrawUntilPlayable ? 1 : 0;
-
-            AddOption("When I finish drawing I [{0}] play a card", "may", "may not");
-            OptionBoxes[2].OptionIndex = ScreenManager.Settings.CanPlayAfterDraw ? 0 : 1;
-        }
-
-        protected override void OnSelect(int index)
-        {
-            // Start hosting the game
-            throw new NotImplementedException();
-        }
-
-        protected override void OnClose()
-        {
-            ScreenManager.Settings.NPlayers = Int32.Parse(OptionBoxes[0].Options[OptionBoxes[0].OptionIndex]);
-            ScreenManager.Settings.DrawUntilPlayable = OptionBoxes[1].OptionIndex == 1;
-            ScreenManager.Settings.CanPlayAfterDraw = OptionBoxes[2].OptionIndex == 0;
-            base.OnClose();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Engine.Input.Managers.SinglePlayer;
+using Engine.Rendering;
 using Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -93,9 +94,12 @@ namespace RainbowMadness
         {
             batch.Draw(FadeBackground, _backgroundRect, Color.White);
             batch.Draw(PopupBackground, _popupBackgroundRect, Color.White);
+            var topLeftCorner = new Vector2(_popupBackgroundRect.Left, _popupBackgroundRect.Top);
+            var dimensions = new Vector2(_popupBackgroundRect.Width, _popupBackgroundRect.Height);
             _msgBox.Draw(batch);
             _confirmBox.Draw(batch);
             _cancelBox.Draw(batch);
+            BasicShapeRenderer.DrawRectangleOutline(batch, topLeftCorner + dimensions / 2, Color.White, dimensions, 0, 2);
         }
 
         public void Update(float dt)
